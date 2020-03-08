@@ -1,0 +1,71 @@
+!pip install wordcloud
+!pip install fileupload
+!pip install ipywidgets
+!jupyter nbextension install --py --user fileupload
+!jupyter nbextension enable --py fileupload
+
+
+
+import wordcloud
+import numpy as np
+from matplotlib import pyplot as plt
+from IPython.display import display
+import fileupload
+import io
+import sys
+
+
+#in next cell of Notebook
+# Here are all the installs and imports you will need for your word cloud script and uploader widget
+
+
+def _upload():
+    _upload_widget=fileupload.FileUploadWidget()
+    
+    
+    def _cb(change):
+        global file_contents
+        decoded=io.StringIO(change["owner"].data.decode("utf-8"))
+        filename=change['owner'].filename
+        print('uploaded `{}` ({:.2f}kb'.format(
+            filename,len(decoded.read())/2**10))
+        file_contents=decoded.getvalue()
+    _upload_widget.observe(_cb,names="data")
+    display(_upload_widget)
+    
+_upload()
+
+#here you have to upload file
+
+
+#in next cell
+def calculate_friquencies(file_contents):
+    punctuations='''~`!@#$%^&*()_+=-/*}{}[]|\';":<>?,./"'''
+    unintresting_words=["is","the","and","ded"]
+    frequencies={}
+    file_contents=file_contents.split()
+    str1=" "
+    
+    for word in file_contents:
+        str1=''.join (ch for ch in word if ch.isalnum())
+        
+        if str1.lower() not in unintresting_words:
+            
+            
+            if str1.lower() not in frequencies:
+                frequencies[str1.lower()]=1
+            else:
+                frequencies[str1.lower()]+=1  
+    cloud= word_cloud.WordCloud()
+    cloud.generate_from_frequencies(frequencies)
+    return cloud.to_array()
+
+#try in next new cell
+
+myimage=calculate_frequencies(file_contents)
+plt.imshow(myimage,interpolation='nearest')
+plt.axis('off')
+plt.show()
+
+
+#Nice work Dude!
